@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Shabad Larrivar</title>
+    <script type="text/javascript" src="./allShabads.js"></script>
+</head>
+<body>
+    <pre id="pre">ffwefffer</pre>
+  </body>
+<script>
+  const pre=document.getElementById("pre");
+  function getRandomShabadId() {
+    const keys = Object.keys(ALLSHABADS);
+    const prop = keys[Math.floor(Math.random() * keys.length)];
+    return prop;
+  }
+  pre.innerText=ALLSHABADS[getRandomShabadId()]
+
+
+    
+</script>
+</html>
+
