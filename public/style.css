@@ -64,6 +64,7 @@ body {
 
 .site-title {
   font-family: var(--font-gurmukhi);
+  font-weight: 600;
   font-size: clamp(22px, 5vw, 30px);
   margin: 0 0 4px;
   color: var(--ink);
@@ -101,19 +102,37 @@ body {
   color: #fff8ea;
 }
 
+/* The border art is applied as a CSS border-image (9-slice) rather than a
+   stretched background: a background-image sized to 100% 100% combined with
+   percentage padding (which CSS resolves against the element's WIDTH, even
+   for top/bottom) meant the ornamental corners shrank to a sliver of the
+   frame's height for long shabads, letting the growing text card cover
+   them. border-image keeps each corner a fixed, undistorted pixel size no
+   matter how tall the content gets — only the straight edges between
+   corners stretch, and only along their own axis (top/bottom stretch
+   horizontally, left/right stretch vertically), which is what an ornate
+   letter border actually looks like when the "page" grows longer. */
 .letter-frame {
   width: 100%;
-  padding: 12.5% 10%;
-  background-image: var(--frame-image);
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-  border-radius: var(--radius-lg);
+  border-style: solid;
+  border-image-source: var(--frame-image);
+  border-image-repeat: stretch;
   display: flex;
   justify-content: center;
 }
 
+.theme-gold .letter-frame {
+  border-width: 44px 34px;
+  border-image-slice: 27% 28% fill;
+}
+
+.theme-indigo .letter-frame {
+  border-width: 78px 30px 34px;
+  border-image-slice: 43% 9% 11% fill;
+}
+
 .letter-inner {
-  background: rgba(255, 253, 246, 0.94);
+  background: rgba(255, 253, 246, 0.96);
   border-radius: var(--radius-md);
   padding: 28px clamp(16px, 4vw, 36px) 34px;
   box-shadow: 0 18px 44px var(--shadow);
@@ -123,6 +142,7 @@ body {
 
 .citation {
   font-family: var(--font-gurmukhi);
+  font-weight: 600;
   font-size: 15px;
   color: var(--accent-strong);
   margin: 0 0 20px;
@@ -143,6 +163,11 @@ body {
 
 .verse-block .verse {
   font-family: var(--font-gurmukhi);
+  /* 600 rather than the font's default 400: at reading size, Gurmukhi's
+     subjoined-consonant marks (rakar/vakar/haha, e.g. ਬ੍ਰਹਮ vs ਬਰਹਮ) are a
+     small hooked stroke that all but disappears at regular weight, making
+     conjunct and non-conjunct spellings look identical at a glance. */
+  font-weight: 600;
   font-size: clamp(19px, 3.4vw, 24px);
   line-height: 1.85;
   color: var(--ink);
@@ -251,7 +276,8 @@ body {
 }
 
 @media (max-width: 420px) {
-  .letter-frame { padding: 16% 6%; }
+  .theme-gold .letter-frame { border-width: 32px 22px; }
+  .theme-indigo .letter-frame { border-width: 56px 20px 24px; }
   .letter-inner { padding: 22px 14px 28px; }
 }
 
