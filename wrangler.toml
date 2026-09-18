@@ -1,0 +1,23 @@
+name = "hukamnama"
+main = "src/index.js"
+compatibility_date = "2026-09-01"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[routes]]
+pattern = "sggs.dosanjhlabs.com"
+custom_domain = true
+
+[[routes]]
+pattern = "dasam.dosanjhlabs.com"
+custom_domain = true
+
+[[routes]]
+pattern = "hukamnama.dosanjhlabs.com"
+custom_domain = true
+
+[[routes]]
+pattern = "hukam.dosanjhlabs.com"
+custom_domain = true
