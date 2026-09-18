@@ -86,11 +86,14 @@ body {
 
 .source-toggle {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 6px;
   background: rgba(0,0,0,0.05);
-  padding: 4px;
-  border-radius: 999px;
+  padding: 6px;
+  border-radius: 20px;
   margin-bottom: 22px;
+  max-width: 100%;
 }
 
 .toggle-btn {
@@ -100,6 +103,7 @@ body {
   border-radius: 999px;
   text-decoration: none;
   color: var(--ink-soft);
+  white-space: nowrap;
   transition: background 0.2s ease, color 0.2s ease;
 }
 
@@ -282,6 +286,83 @@ body {
   margin-bottom: 22px;
 }
 
+.faq-page {
+  text-align: left;
+  font-family: var(--font-serif);
+  max-width: 640px;
+}
+
+.faq-page h1 {
+  font-family: var(--font-gurmukhi);
+  text-align: center;
+  margin-top: 0;
+}
+
+.faq-hero {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  margin-bottom: 22px;
+  box-shadow: 0 12px 30px var(--shadow);
+}
+
+.faq-page details {
+  border-bottom: 1px solid rgba(38, 32, 25, 0.12);
+  padding: 16px 2px;
+}
+
+.faq-page summary {
+  font-family: var(--font-ui);
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--ink);
+}
+
+.faq-page summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-page summary::after {
+  content: "+";
+  font-size: 20px;
+  color: var(--accent-strong);
+  margin-left: 12px;
+  transition: transform 0.2s ease;
+}
+
+.faq-page details[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.faq-body {
+  margin-top: 12px;
+  color: var(--ink-soft);
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.faq-body code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.9em;
+  background: rgba(38, 32, 25, 0.08);
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+.faq-body ul,
+.faq-body ol {
+  padding-left: 22px;
+}
+
+.faq-body li {
+  margin-bottom: 8px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn { transition: none; }
 }
@@ -321,4 +402,6 @@ body {
   .btn-outline { border-color: rgba(243,234,210,0.35); color: var(--ink); }
   .source-toggle { background: rgba(255,255,255,0.08); }
   .toggle-btn { color: var(--ink-soft); }
+  .faq-page details { border-bottom-color: rgba(243, 234, 210, 0.18); }
+  .faq-body code { background: rgba(243, 234, 210, 0.12); }
 }

@@ -51,11 +51,16 @@ const SITES = {
     tagline: "Vaak — One Word from Any of the Three Granths",
     sources: ["aad", "dasam", "sarbloh"],
     toggle: true,
+    // Every non-empty combination of the three granths, so a visitor can
+    // read them together, separately, or any two at once.
     toggleOptions: [
-      { keys: ["aad", "dasam", "sarbloh"], label: "All" },
-      { keys: ["aad"], label: "Sri Guru Granth Sahib" },
-      { keys: ["dasam"], label: "Dasam Granth" },
-      { keys: ["sarbloh"], label: "Sarbloh Granth" },
+      { keys: ["aad", "dasam", "sarbloh"], label: "All Three" },
+      { keys: ["aad"], label: "SGGS" },
+      { keys: ["dasam"], label: "Dasam" },
+      { keys: ["sarbloh"], label: "Sarbloh" },
+      { keys: ["aad", "dasam"], label: "SGGS + Dasam" },
+      { keys: ["aad", "sarbloh"], label: "SGGS + Sarbloh" },
+      { keys: ["dasam", "sarbloh"], label: "Dasam + Sarbloh" },
     ],
   },
 };
@@ -305,7 +310,7 @@ function pageHtml({ site, entry, activeSources }) {
 
     <footer class="site-footer">
       <p>ਵਾਹਿਗੁਰੂ ਜੀ ਕਾ ਖ਼ਾਲਸਾ, ਵਾਹਿਗੁਰੂ ਜੀ ਕੀ ਫ਼ਤਿਹ</p>
-      <p class="footnote"><a href="/sources">Sources &amp; text provenance</a></p>
+      <p class="footnote"><a href="/sources">Sources &amp; text provenance</a> &middot; <a href="/faq">FAQ &amp; Shortcuts setup</a></p>
     </footer>
   </main>
 
@@ -340,7 +345,95 @@ function sourcesPageHtml() {
     <h2>Sri Sarbloh Granth Sahib Ji</h2>
     <p>Digitized from <em>Sampooran Sri Sarbloh Granth Sahib</em>, published under the authority of Singh Sahib Baba Santa Singh Ji, Jathedar, Panth Akali Buddha Dal (Sri Satguru Jagjit Singh Ji eLibrary digitization, archive.org). Gurmukhi text is OCR-derived from the published Granth; the accompanying English rendering is a machine translation of that OCR text and has not been independently reviewed by a scholar &mdash; please treat it as a study aid rather than an authoritative translation. Front matter, indices, and publisher pages were excluded from the random selection pool; each entry cites its page number in that published edition.</p>
   </section>
-  <p><a href="/">&larr; Back</a></p>
+  <p><a href="/">&larr; Back</a> &middot; <a href="/faq">FAQ &amp; Shortcuts setup</a></p>
+</main>
+</body>
+</html>`;
+}
+
+function faqPageHtml() {
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAQ &amp; Shortcuts Setup — Hukamnama</title>
+<meta name="description" content="How to set up iOS Shortcuts for daily hukamnamas, and related Sikhi resources.">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body class="theme-gold">
+<main class="page faq-page">
+  <img class="faq-hero" src="/images/manuscript-hero.webp" alt="" loading="eager">
+  <h1>FAQ &amp; Shortcuts Setup</h1>
+
+  <details open>
+    <summary>What is this site?</summary>
+    <div class="faq-body">
+      <p>A daily Vaak (Hukamnama) drawn at random from Sri Guru Granth Sahib Ji, Sri Dasam Granth Sahib Ji, and Sri Sarbloh Granth Sahib Ji &mdash; presented as an illuminated letter. There are three addresses:</p>
+      <ul>
+        <li><a href="https://sggs.dosanjhlabs.com">sggs.dosanjhlabs.com</a> &mdash; Sri Guru Granth Sahib Ji only</li>
+        <li><a href="https://dasam.dosanjhlabs.com">dasam.dosanjhlabs.com</a> &mdash; Dasam Granth &amp; Sarbloh Granth</li>
+        <li><a href="https://hukamnama.dosanjhlabs.com">hukamnama.dosanjhlabs.com</a> &mdash; all three, together, separately, or any two at once, via the toggle at the top</li>
+      </ul>
+    </div>
+  </details>
+
+  <details>
+    <summary>How accurate is the text?</summary>
+    <div class="faq-body">
+      <p>Sri Guru Granth Sahib Ji and Sri Dasam Granth Sahib Ji have been checked entry-by-entry against banidb.com. Sri Sarbloh Granth Sahib Ji is OCR from a published edition and hasn't been independently proofread. Full details, sources, and caveats are on the <a href="/sources">Sources &amp; provenance</a> page.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Set up an iOS Shortcut &mdash; iOS 26 (step by step)</summary>
+    <div class="faq-body">
+      <ol>
+        <li>Open the <strong>Shortcuts</strong> app &rarr; tap <strong>+</strong> in the top corner to create a new shortcut.</li>
+        <li>Tap <strong>Add Action</strong>, search for <strong>Get Contents of URL</strong>, and add it.</li>
+        <li>Tap the URL field and enter one of:
+          <ul>
+            <li><code>https://sggs.dosanjhlabs.com/text</code></li>
+            <li><code>https://dasam.dosanjhlabs.com/text</code></li>
+            <li><code>https://hukamnama.dosanjhlabs.com/text</code> (add <code>?src=aad</code>, <code>?src=dasam</code>, or <code>?src=sarbloh</code> to pin it to one granth, or e.g. <code>?src=aad,dasam</code> for two)</li>
+          </ul>
+        </li>
+        <li>Add another action &mdash; <strong>Show Result</strong>, <strong>Speak Text</strong>, <strong>Send Message</strong>, or <strong>Show Notification</strong> all work. When it asks for input, choose <strong>Contents of URL</strong> (offered automatically from the step above).</li>
+        <li>Tap the shortcut's name at the top to rename it (e.g. "Hukamnama"), then tap <strong>Done</strong>.</li>
+        <li>Optional: tap the settings icon on the shortcut, turn on <strong>Add to Home Screen</strong>, or set up an <strong>Automation</strong> (e.g. every morning at 6am) so it runs on its own.</li>
+      </ol>
+    </div>
+  </details>
+
+  <details>
+    <summary>Set up an iOS Shortcut &mdash; iOS 27 (prompt-based)</summary>
+    <div class="faq-body">
+      <p>If your Shortcuts app can build a shortcut from a plain-language description, you can skip the manual steps above and just give it a prompt like one of these:</p>
+      <ul>
+        <li>"Create a shortcut that fetches <code>https://sggs.dosanjhlabs.com/text</code> and shows me the result."</li>
+        <li>"Create a shortcut that fetches <code>https://dasam.dosanjhlabs.com/text</code> and speaks the result out loud."</li>
+        <li>"Create a shortcut that fetches <code>https://hukamnama.dosanjhlabs.com/text?src=aad,dasam</code> and sends it to me as a notification every morning at 6am."</li>
+      </ul>
+      <p>Swap in whichever domain and <code>?src=</code> combination you want (see the step-by-step section above for the full list) &mdash; the prompt only needs to name the URL and what to do with the text it gets back.</p>
+    </div>
+  </details>
+
+  <details>
+    <summary>Related resources</summary>
+    <div class="faq-body">
+      <ul>
+        <li><a href="https://sikhi.io">sikhi.io</a></li>
+        <li><a href="https://sikhiuni.com">sikhiuni.com</a> &mdash; Sikh University</li>
+        <li><a href="https://sikhinteractive.com">sikhinteractive.com</a></li>
+        <li><a href="https://punjabiuni.com">punjabiuni.com</a></li>
+        <li><a href="https://huggingface.co/datasets/jsdosanj/SikhLibrary">jsdosanj/SikhLibrary</a> on Hugging Face &mdash; the research corpus this site's Sarbloh Granth text comes from</li>
+        <li><a href="https://basicsofsikhi.com">basicsofsikhi.com</a></li>
+        <li><a href="https://forms.monday.com/forms/79d204bbfd466e71a18f6744dc5efd9f?r=use1">Basics of Sikhi &mdash; speaker request form</a></li>
+      </ul>
+    </div>
+  </details>
+
+  <p><a href="/">&larr; Back</a> &middot; <a href="/sources">Sources &amp; text provenance</a></p>
 </main>
 </body>
 </html>`;
@@ -430,6 +523,9 @@ export default {
     }
     if (url.pathname === "/sources") {
       return new Response(sourcesPageHtml(), { headers: { "content-type": "text/html; charset=utf-8" } });
+    }
+    if (url.pathname === "/faq") {
+      return new Response(faqPageHtml(), { headers: { "content-type": "text/html; charset=utf-8" } });
     }
     if (url.pathname === "/text") {
       const sourcesParam = url.searchParams.get("src");
