@@ -1,6 +1,72 @@
 (function () {
   "use strict";
 
+  // ---- Hero carousel ----
+  // Only the active slide and the one queued up next ever have a real
+  // `src` — the rest keep their image behind data-src until their turn,
+  // so a visit only ever pulls down two of the ten banners.
+  (function initHeroCarousel() {
+    const carousel = document.getElementById("hero-carousel");
+    if (!carousel) return;
+    const slides = Array.from(carousel.querySelectorAll(".hero-slide"));
+    const dots = Array.from(carousel.querySelectorAll(".hero-dot"));
+    if (slides.length < 2) return;
+
+    let current = slides.findIndex((s) => s.classList.contains("active"));
+    if (current < 0) current = 0;
+    let timer = null;
+    const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    function ensureLoaded(index) {
+      const img = slides[index];
+      if (img.dataset.src && !img.src) img.src = img.dataset.src;
+    }
+
+    function goTo(index) {
+      if (index === current) return;
+      ensureLoaded(index);
+      slides[current].classList.remove("active");
+      if (dots[current]) dots[current].classList.remove("active");
+      slides[index].classList.add("active");
+      if (dots[index]) dots[index].classList.add("active");
+      current = index;
+      ensureLoaded((current + 1) % slides.length); // pre-warm the next one
+    }
+
+    function next() {
+      goTo((current + 1) % slides.length);
+    }
+
+    function startAutoplay() {
+      if (reduceMotion) return;
+      stopAutoplay();
+      timer = setInterval(next, 5500);
+    }
+
+    function stopAutoplay() {
+      if (timer) clearInterval(timer);
+      timer = null;
+    }
+
+    ensureLoaded((current + 1) % slides.length);
+
+    dots.forEach((dot, i) => {
+      dot.addEventListener("click", () => {
+        goTo(i);
+        startAutoplay();
+      });
+    });
+
+    carousel.addEventListener("mouseenter", stopAutoplay);
+    carousel.addEventListener("mouseleave", startAutoplay);
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopAutoplay();
+      else startAutoplay();
+    });
+
+    startAutoplay();
+  })();
+
   const GURMUKHI_RE = /[਀-੿]/;
 
   function readJsonScript(id) {

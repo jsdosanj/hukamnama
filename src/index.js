@@ -19,6 +19,41 @@ const SOURCE_THEME = {
   sarbloh: { theme: "accent", border: "/borders/border-accent.webp" },
 };
 
+// Rotating hero banner shown atop every page. Only the first is rendered
+// as a real <img src>; the rest carry data-src and are faded in one at a
+// time by app.js, so a visitor only ever downloads two of these at once.
+const HERO_BANNERS = [
+  "/images/banners/banner-01-sangat.webp",
+  "/images/banners/banner-02-manuscript.webp",
+  "/images/banners/banner-03-court.webp",
+  "/images/banners/banner-04-musicians.webp",
+  "/images/banners/banner-05-goldentemple.webp",
+  "/images/banners/banner-06-canopy.webp",
+  "/images/banners/banner-07-sketch.webp",
+  "/images/banners/banner-08-falcon.webp",
+  "/images/banners/banner-09-darbar.webp",
+  "/images/banners/banner-10-academy.webp",
+];
+
+function heroCarouselHtml() {
+  const slides = HERO_BANNERS.map((src, i) => {
+    if (i === 0) {
+      return `<img class="hero-slide active" src="${src}" alt="" loading="eager" fetchpriority="high">`;
+    }
+    return `<img class="hero-slide" data-src="${src}" alt="" loading="lazy">`;
+  }).join("\n      ");
+  const dots = HERO_BANNERS.map(
+    (_, i) => `<button type="button" class="hero-dot${i === 0 ? " active" : ""}" data-index="${i}" aria-label="Show banner ${i + 1}"></button>`
+  ).join("");
+  return `
+  <div class="hero-carousel" id="hero-carousel" aria-hidden="true">
+    <div class="hero-slides">
+      ${slides}
+    </div>
+    <div class="hero-dots">${dots}</div>
+  </div>`;
+}
+
 const SITES = {
   sggs: {
     hostnames: ["sggs.dosanjhlabs.com"],
@@ -254,7 +289,8 @@ function pageHtml({ site, entry, activeSources }) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#f6efe0">
+<meta name="theme-color" content="#f6efe0" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17140f" media="(prefers-color-scheme: dark)">
 <title>${escapeHtml(site.title)} — Hukamnama</title>
 <meta name="description" content="A daily Vaak from ${escapeHtml(site.title)}, presented as a hand-illuminated letter.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -273,6 +309,7 @@ function pageHtml({ site, entry, activeSources }) {
   })}</script>
 </head>
 <body class="${themeClass}">
+  ${heroCarouselHtml()}
   <main class="page">
     <div class="ornament ornament-top" aria-hidden="true"></div>
     <header class="masthead">

@@ -10,6 +10,7 @@
   --terracotta: #8a3324;
   --royal-blue: #1a3a8f;
   --shadow: rgba(38, 32, 25, 0.18);
+  --carousel-fade: #fffdf6;
   --radius-lg: 22px;
   --radius-md: 14px;
   --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -36,13 +37,26 @@ html, body {
   padding: 0;
 }
 
+html {
+  background: #fffdf6;
+}
+
 body {
   background: radial-gradient(circle at top, #fffdf6 0%, var(--parchment) 45%, var(--parchment-deep) 100%);
   color: var(--ink);
   font-family: var(--font-serif);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
-  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  /* Top safe-area is handled by the hero carousel itself on pages that have
+     one (it bleeds under the notch/status bar) — see .sources-page for the
+     plain pages that don't. */
+  padding: 0 env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  animation: page-fade-in 0.35s ease both;
+}
+
+@keyframes page-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .page {
@@ -52,6 +66,84 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+/* Hero carousel — bleeds full-bleed edge to edge and under the status
+   bar/notch (the safe-area inset is added to its height rather than as
+   padding, so the image itself extends up there, not empty space). Only
+   two slides are ever loaded at once (see app.js); the rest sit inert
+   with data-src until their turn. A soft gradient at the base blends it
+   into the page background so it reads as one continuous surface rather
+   than a photo pasted on top. */
+.hero-carousel {
+  position: relative;
+  width: 100%;
+  height: calc(clamp(190px, 34vh, 340px) + env(safe-area-inset-top));
+  overflow: hidden;
+  background: #14110d;
+}
+
+.hero-slides {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  will-change: opacity;
+}
+
+.hero-slide.active {
+  opacity: 1;
+}
+
+.hero-carousel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0) 45%, var(--carousel-fade) 96%);
+  pointer-events: none;
+}
+
+.hero-dots {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 14px;
+  display: flex;
+  justify-content: center;
+  gap: 7px;
+}
+
+.hero-dot {
+  width: 7px;
+  height: 7px;
+  /* Padding + background-clip give this a comfortable ~23px tap target
+     on touch devices while keeping the visible dot small. */
+  padding: 8px;
+  background-clip: content-box;
+  border-radius: 999px;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.hero-dot.active {
+  background-color: #fffdf6;
+  transform: scale(1.3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide {
+    transition: none;
+  }
 }
 
 .masthead {
@@ -276,6 +368,9 @@ body {
 .sources-page {
   text-align: left;
   font-family: var(--font-serif);
+  /* These pages have no hero carousel bleeding under the status bar, so
+     they need their own top safe-area allowance. */
+  padding-top: max(32px, calc(env(safe-area-inset-top) + 12px));
 }
 
 .sources-page h1 {
@@ -384,6 +479,7 @@ body {
     --ink-soft: #cabf9d;
     --gold: #e0b84a;
     --gold-bright: #f0cf6b;
+    --carousel-fade: #23201c;
   }
   body {
     background: radial-gradient(circle at top, #23201c 0%, #17140f 55%, #0f0d0a 100%);
