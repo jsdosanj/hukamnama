@@ -1,0 +1,285 @@
+:root {
+  --ink: #262019;
+  --ink-soft: #4a4034;
+  --parchment: #f7f0df;
+  --parchment-deep: #efe4c8;
+  --gold: #b9902e;
+  --gold-bright: #d4af37;
+  --maroon: #7a1f2b;
+  --indigo: #232a5c;
+  --terracotta: #8a3324;
+  --shadow: rgba(38, 32, 25, 0.18);
+  --radius-lg: 22px;
+  --radius-md: 14px;
+  --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
+  --font-gurmukhi: "Noto Serif Gurmukhi", "Noto Sans Gurmukhi", serif;
+  --accent: var(--gold);
+  --accent-strong: var(--maroon);
+}
+
+.theme-indigo {
+  --accent: var(--indigo);
+  --accent-strong: var(--terracotta);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: radial-gradient(circle at top, #fffdf6 0%, var(--parchment) 45%, var(--parchment-deep) 100%);
+  color: var(--ink);
+  font-family: var(--font-serif);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 32px 20px 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.masthead {
+  text-align: center;
+  margin-bottom: 22px;
+}
+
+.eyebrow {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 11px;
+  color: var(--accent-strong);
+  margin: 0 0 10px;
+}
+
+.site-title {
+  font-family: var(--font-gurmukhi);
+  font-size: clamp(22px, 5vw, 30px);
+  margin: 0 0 4px;
+  color: var(--ink);
+}
+
+.site-title-en {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+.source-toggle {
+  display: flex;
+  gap: 6px;
+  background: rgba(0,0,0,0.05);
+  padding: 4px;
+  border-radius: 999px;
+  margin-bottom: 22px;
+}
+
+.toggle-btn {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  text-decoration: none;
+  color: var(--ink-soft);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.toggle-btn.active {
+  background: var(--accent);
+  color: #fff8ea;
+}
+
+.letter-frame {
+  width: 100%;
+  padding: 12.5% 10%;
+  background-image: var(--frame-image);
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  border-radius: var(--radius-lg);
+  display: flex;
+  justify-content: center;
+}
+
+.letter-inner {
+  background: rgba(255, 253, 246, 0.94);
+  border-radius: var(--radius-md);
+  padding: 28px clamp(16px, 4vw, 36px) 34px;
+  box-shadow: 0 18px 44px var(--shadow);
+  width: 100%;
+  text-align: center;
+}
+
+.citation {
+  font-family: var(--font-gurmukhi);
+  font-size: 15px;
+  color: var(--accent-strong);
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+
+.citation-en {
+  font-family: var(--font-ui);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+.verse-block {
+  text-align: center;
+}
+
+.verse-block .verse {
+  font-family: var(--font-gurmukhi);
+  font-size: clamp(19px, 3.4vw, 24px);
+  line-height: 1.85;
+  color: var(--ink);
+  margin: 0 0 18px;
+}
+
+.verse-block .translation {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(15px, 2.6vw, 17px);
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin: 0 0 26px;
+}
+
+.controls {
+  width: 100%;
+  margin-top: 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: 14px;
+  font-weight: 600;
+  padding: 12px 18px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  min-height: 44px;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: var(--accent);
+  color: #fffaf0;
+  box-shadow: 0 8px 20px var(--shadow);
+}
+
+.btn-outline {
+  background: transparent;
+  border-color: rgba(38,32,25,0.25);
+  color: var(--ink);
+}
+
+.btn-ghost {
+  background: transparent;
+  border: none;
+  color: var(--accent-strong);
+}
+
+.status {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  min-height: 16px;
+  margin: 0;
+}
+
+.site-footer {
+  margin-top: 46px;
+  text-align: center;
+  font-family: var(--font-gurmukhi);
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.footnote {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  margin-top: 8px;
+}
+
+.footnote a {
+  color: var(--ink-soft);
+}
+
+.sources-page {
+  text-align: left;
+  font-family: var(--font-serif);
+}
+
+.sources-page h1 {
+  font-family: var(--font-gurmukhi);
+}
+
+.sources-page section {
+  margin-bottom: 22px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn { transition: none; }
+}
+
+@media (max-width: 420px) {
+  .letter-frame { padding: 16% 6%; }
+  .letter-inner { padding: 22px 14px 28px; }
+}
+
+/* Dark mode — the letter card itself always stays parchment-toned (a lit
+   page in a dark room), so only the chrome around it inverts. This block
+   is intentionally last so it wins cascade ties against the base rules
+   above it (same selector specificity, later source order). */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #f3ead2;
+    --ink-soft: #cabf9d;
+    --gold: #e0b84a;
+    --gold-bright: #f0cf6b;
+  }
+  body {
+    background: radial-gradient(circle at top, #23201c 0%, #17140f 55%, #0f0d0a 100%);
+    color: var(--ink);
+  }
+  .letter-inner {
+    background: rgba(255, 253, 246, 0.97);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.55);
+  }
+  .citation { color: var(--maroon); }
+  .theme-indigo .citation { color: var(--terracotta); }
+  .citation-en { color: #4a4034; }
+  .verse-block .verse { color: #262019; }
+  .verse-block .translation { color: #4a4034; }
+  .btn-outline { border-color: rgba(243,234,210,0.35); color: var(--ink); }
+  .source-toggle { background: rgba(255,255,255,0.08); }
+  .toggle-btn { color: var(--ink-soft); }
+}
