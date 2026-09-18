@@ -44,7 +44,7 @@
   function applyEntry(entry) {
     state.rawText = `${entry.citation}\n\n${entry.text}`;
     state.bodyText = entry.text;
-    state.meta = { id: entry.id, source: entry.source, citation: entry.citation };
+    state.meta = { id: entry.id, source: entry.source, citation: entry.citation, theme: entry.theme, border: entry.border };
     state.currentId = entry.id;
 
     const citationEl = document.querySelector(".citation");
@@ -56,6 +56,25 @@
 
     const verseBlock = document.getElementById("verse-block");
     if (verseBlock) verseBlock.innerHTML = renderLinesHtml(entry.text);
+
+    // The border/colour theme follows the entry's own granth, not the
+    // domain, so on a combined site (or the toggleable dasam+sarbloh one)
+    // picking a new entry can change which frame is shown.
+    if (entry.theme) {
+      document.body.className = document.body.className
+        .split(/\s+/)
+        .filter((c) => !c.startsWith("theme-"))
+        .concat(`theme-${entry.theme}`)
+        .join(" ");
+    }
+    if (entry.border) {
+      const frame = document.getElementById("letter-frame");
+      if (frame) frame.style.setProperty("--frame-image", `url('${entry.border}')`);
+      const frameImg = document.getElementById("frame-img");
+      if (frameImg && frameImg.getAttribute("src") !== entry.border) {
+        frameImg.src = entry.border;
+      }
+    }
 
     const url = new URL(location.href);
     url.searchParams.set("id", entry.id);
@@ -212,9 +231,19 @@
     }
   }
 
+  function ensureImageLoaded(img) {
+    if (img.complete && img.naturalWidth) return Promise.resolve();
+    return new Promise((resolve) => {
+      img.addEventListener("load", () => resolve(), { once: true });
+      img.addEventListener("error", () => resolve(), { once: true });
+      setTimeout(resolve, 3000); // don't block export forever on a slow/broken load
+    });
+  }
+
   async function buildShareCanvas() {
     await ensureFontsReady();
     const frameImg = document.getElementById("frame-img");
+    await ensureImageLoaded(frameImg);
     const canvas = document.getElementById("export-canvas");
     const width = 1080;
     const paddingX = width * 0.12;
@@ -261,8 +290,9 @@
     roundRect(ctx, cardX, cardY, cardW, cardH, 24);
     ctx.fill();
 
+    const accentColors = { gold: "#7a1f2b", indigo: "#8a3324", accent: "#1a3a8f" };
     ctx.textAlign = "center";
-    ctx.fillStyle = "#7a1f2b";
+    ctx.fillStyle = accentColors[state.meta.theme] || "#7a1f2b";
     ctx.font = '600 24px "Noto Serif Gurmukhi", serif';
     let y = cardY + 60;
     const citationLines = wrapText(ctx, state.meta.citation || "", cardW * 0.85);

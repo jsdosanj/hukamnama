@@ -128,7 +128,12 @@ word-for-word accuracy against the physical Granth.
 - `dasam.dosanjhlabs.com` draws from Sri Dasam Granth Sahib Ji and Sri
   Sarbloh Granth Sahib Ji combined by default, with a toggle to narrow to
   either one.
+- `hukamnama.dosanjhlabs.com` draws from all three granths combined by
+  default, with a toggle to narrow to any one of them.
 
-Both domains are served by the same Cloudflare Worker, which chooses the
-dataset purely from the request's hostname — there is no shared
-client-side state between the two sites.
+All three domains are served by the same Cloudflare Worker, which chooses
+the dataset purely from the request's hostname — there is no shared
+client-side state between the sites. The border art and colour theme
+follow the entry actually shown (gold for SGGS, indigo for Dasam Granth,
+blue for Sarbloh Granth), not the domain, so the same shabad always looks
+the same wherever it's read.

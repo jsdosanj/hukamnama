@@ -8,6 +8,7 @@
   --maroon: #7a1f2b;
   --indigo: #232a5c;
   --terracotta: #8a3324;
+  --royal-blue: #1a3a8f;
   --shadow: rgba(38, 32, 25, 0.18);
   --radius-lg: 22px;
   --radius-md: 14px;
@@ -21,6 +22,11 @@
 .theme-indigo {
   --accent: var(--indigo);
   --accent-strong: var(--terracotta);
+}
+
+.theme-accent {
+  --accent: var(--royal-blue);
+  --accent-strong: var(--royal-blue);
 }
 
 * { box-sizing: border-box; }
@@ -129,6 +135,11 @@ body {
 .theme-indigo .letter-frame {
   border-width: 78px 30px 34px;
   border-image-slice: 43% 9% 11% fill;
+}
+
+.theme-accent .letter-frame {
+  border-width: 70px 28px 32px;
+  border-image-slice: 39% 14% 11% fill;
 }
 
 .letter-inner {
@@ -278,6 +289,7 @@ body {
 @media (max-width: 420px) {
   .theme-gold .letter-frame { border-width: 32px 22px; }
   .theme-indigo .letter-frame { border-width: 56px 20px 24px; }
+  .theme-accent .letter-frame { border-width: 50px 20px 22px; }
   .letter-inner { padding: 22px 14px 28px; }
 }
 
@@ -302,6 +314,7 @@ body {
   }
   .citation { color: var(--maroon); }
   .theme-indigo .citation { color: var(--terracotta); }
+  .theme-accent .citation { color: var(--royal-blue); }
   .citation-en { color: #4a4034; }
   .verse-block .verse { color: #262019; }
   .verse-block .translation { color: #4a4034; }

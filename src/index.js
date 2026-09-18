@@ -1,13 +1,23 @@
-// Hukamnama — a single Cloudflare Worker serving two granths on two domains.
+// Hukamnama — a single Cloudflare Worker serving three granths on three domains.
 //
-// sggs.dosanjhlabs.com  -> Sri Guru Granth Sahib Ji only
-// dasam.dosanjhlabs.com -> Sri Dasam Granth Sahib Ji + Sri Sarbloh Granth Sahib Ji
+// sggs.dosanjhlabs.com     -> Sri Guru Granth Sahib Ji only
+// dasam.dosanjhlabs.com    -> Sri Dasam Granth Sahib Ji + Sri Sarbloh Granth Sahib Ji
+// hukamnama.dosanjhlabs.com -> all three, together, with a toggle
 //
 // Routing is purely by request hostname, server-side, with no shared
 // client-side toggle state — each domain only ever has access to its own
-// dataset, so the two sites cannot bleed into each other.
+// dataset, so the sites cannot bleed into each other.
 
 const GURMUKHI_RE = /[਀-੿]/;
+
+// The border art and colour theme follow the ENTRY actually being shown,
+// not the site/domain — so the same shabad always looks the same everywhere,
+// and the combined hukamnama.dosanjhlabs.com can switch its frame per pick.
+const SOURCE_THEME = {
+  aad: { theme: "gold", border: "/borders/border-gold.webp" },
+  dasam: { theme: "indigo", border: "/borders/border-indigo.webp" },
+  sarbloh: { theme: "accent", border: "/borders/border-accent.webp" },
+};
 
 const SITES = {
   sggs: {
@@ -16,8 +26,6 @@ const SITES = {
     title: "Sri Guru Granth Sahib Ji",
     titleGurmukhi: "ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ ਸਾਹਿਬ ਜੀ",
     tagline: "Vaak — A Living Word from the Eternal Guru",
-    theme: "gold",
-    border: "/borders/border-gold.webp",
     sources: ["aad"],
     toggle: false,
   },
@@ -27,10 +35,28 @@ const SITES = {
     title: "Sri Dasam Granth & Sri Sarbloh Granth",
     titleGurmukhi: "ਸ੍ਰੀ ਦਸਮ ਗ੍ਰੰਥ ਤੇ ਸ੍ਰੀ ਸਰਬਲੋਹ ਗ੍ਰੰਥ",
     tagline: "Vaak — A Living Word from the Tenth Master",
-    theme: "indigo",
-    border: "/borders/border-indigo.webp",
     sources: ["dasam", "sarbloh"],
     toggle: true,
+    toggleOptions: [
+      { keys: ["dasam", "sarbloh"], label: "Both" },
+      { keys: ["dasam"], label: "Dasam Granth" },
+      { keys: ["sarbloh"], label: "Sarbloh Granth" },
+    ],
+  },
+  all: {
+    hostnames: ["hukamnama.dosanjhlabs.com"],
+    id: "all",
+    title: "Sri Guru Granth Sahib, Dasam Granth & Sarbloh Granth",
+    titleGurmukhi: "ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ, ਦਸਮ ਗ੍ਰੰਥ ਤੇ ਸਰਬਲੋਹ ਗ੍ਰੰਥ",
+    tagline: "Vaak — One Word from Any of the Three Granths",
+    sources: ["aad", "dasam", "sarbloh"],
+    toggle: true,
+    toggleOptions: [
+      { keys: ["aad", "dasam", "sarbloh"], label: "All" },
+      { keys: ["aad"], label: "Sri Guru Granth Sahib" },
+      { keys: ["dasam"], label: "Dasam Granth" },
+      { keys: ["sarbloh"], label: "Sarbloh Granth" },
+    ],
   },
 };
 
@@ -196,23 +222,18 @@ function renderLines(text) {
 }
 
 function sourceOptionsHtml(site, activeSources) {
-  if (!site.toggle) return "";
-  const opts = [
-    { key: "dasam,sarbloh", label: "Both" },
-    { key: "dasam", label: "Dasam Granth" },
-    { key: "sarbloh", label: "Sarbloh Granth" },
-  ];
-  const activeKey = [...activeSources].sort().join(",") === "dasam,sarbloh"
-    ? "dasam,sarbloh"
-    : activeSources.join(",");
+  if (!site.toggle || !site.toggleOptions) return "";
+  const activeSet = [...activeSources].sort().join(",");
   return `
     <div class="source-toggle" role="tablist" aria-label="Choose bani source">
-      ${opts
-        .map(
-          (o) => `<a role="tab" aria-selected="${o.key === activeKey}" class="toggle-btn${
-            o.key === activeKey ? " active" : ""
-          }" href="/?src=${encodeURIComponent(o.key)}">${o.label}</a>`
-        )
+      ${site.toggleOptions
+        .map((o) => {
+          const key = o.keys.join(",");
+          const isActive = [...o.keys].sort().join(",") === activeSet;
+          return `<a role="tab" aria-selected="${isActive}" class="toggle-btn${
+            isActive ? " active" : ""
+          }" href="/?src=${encodeURIComponent(key)}">${o.label}</a>`;
+        })
         .join("")}
     </div>`;
 }
@@ -220,7 +241,8 @@ function sourceOptionsHtml(site, activeSources) {
 function pageHtml({ site, entry, activeSources }) {
   const rawTextJson = JSON.stringify(`${entry.citation}\n\n${entry.text}`);
   const verseHtml = renderLines(entry.text);
-  const themeClass = `theme-${site.theme}`;
+  const { theme, border } = SOURCE_THEME[entry.source];
+  const themeClass = `theme-${theme}`;
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -241,6 +263,8 @@ function pageHtml({ site, entry, activeSources }) {
     source: entry.source,
     citation: entry.citation,
     sources: activeSources,
+    theme,
+    border,
   })}</script>
 </head>
 <body class="${themeClass}">
@@ -254,7 +278,7 @@ function pageHtml({ site, entry, activeSources }) {
 
     ${sourceOptionsHtml(site, activeSources)}
 
-    <section class="letter-frame" style="--frame-image:url('${site.border}')">
+    <section class="letter-frame" id="letter-frame" style="--frame-image:url('${border}')">
       <div class="letter-inner">
         <p class="citation">${escapeHtml(entry.citationGurmukhi)}<br><span class="citation-en">${escapeHtml(
     entry.citation
@@ -286,7 +310,7 @@ function pageHtml({ site, entry, activeSources }) {
   </main>
 
   <canvas id="export-canvas" style="display:none" aria-hidden="true"></canvas>
-  <img id="frame-img" src="${site.border}" style="display:none" alt="" crossorigin="anonymous">
+  <img id="frame-img" src="${border}" style="display:none" alt="" crossorigin="anonymous">
   <script src="/app.js" defer></script>
 </body>
 </html>`;
@@ -336,13 +360,7 @@ async function handleApi(env, url, site) {
     entry = await loadEntry(env, picked.source, picked.id);
   }
 
-  return Response.json({
-    id: entry.id,
-    source: entry.source,
-    citation: entry.citation,
-    citationGurmukhi: entry.citationGurmukhi,
-    text: entry.text,
-  });
+  return Response.json(entryResponse(entry));
 }
 
 async function handleNeighbor(env, url, site, direction) {
@@ -352,13 +370,18 @@ async function handleNeighbor(env, url, site, direction) {
   const source = (idParam && datasetForId(idParam)) || activeSources[0];
   const nid = await neighborId(env, source, idParam, direction);
   const entry = await loadEntry(env, source, nid);
-  return Response.json({
+  return Response.json(entryResponse(entry));
+}
+
+function entryResponse(entry) {
+  return {
     id: entry.id,
     source: entry.source,
     citation: entry.citation,
     citationGurmukhi: entry.citationGurmukhi,
     text: entry.text,
-  });
+    ...SOURCE_THEME[entry.source],
+  };
 }
 
 function landingHtml() {
@@ -373,10 +396,11 @@ function landingHtml() {
 <body class="theme-gold">
 <main class="page sources-page">
   <h1>Hukamnama</h1>
-  <p>This service is reached via its two dedicated addresses:</p>
+  <p>This service is reached via its dedicated addresses:</p>
   <ul>
     <li><a href="https://sggs.dosanjhlabs.com">sggs.dosanjhlabs.com</a> — Sri Guru Granth Sahib Ji</li>
     <li><a href="https://dasam.dosanjhlabs.com">dasam.dosanjhlabs.com</a> — Sri Dasam Granth &amp; Sri Sarbloh Granth</li>
+    <li><a href="https://hukamnama.dosanjhlabs.com">hukamnama.dosanjhlabs.com</a> — all three granths, together</li>
   </ul>
 </main>
 </body>
