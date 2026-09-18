@@ -7,8 +7,9 @@ border.
 - **sggs.dosanjhlabs.com** — Sri Guru Granth Sahib Ji
 - **dasam.dosanjhlabs.com** — Sri Dasam Granth Sahib Ji & Sri Sarbloh
   Granth Sahib Ji (toggle between them, or read both)
-- **hukamnama.dosanjhlabs.com** — all three granths together, with a
-  toggle to narrow to any one of them
+- **hukam.dosanjhlabs.com** — all three granths together, with a
+  toggle to narrow to any one of them (`hukamnama.dosanjhlabs.com` still
+  works too, as an alias)
 
 One Worker, one codebase, routing purely by request hostname — see
 `src/index.js`. Each domain only ever has access to its own dataset, so
@@ -73,7 +74,7 @@ SOURCES.md           Text provenance for all three granths
 
 `src` is a comma-separated subset of that domain's sources: `dasam,sarbloh`
 on `dasam.dosanjhlabs.com`, or `aad,dasam,sarbloh` on
-`hukamnama.dosanjhlabs.com` (e.g. `?src=aad` there shows SGGS only). It has
+`hukam.dosanjhlabs.com` (e.g. `?src=aad` there shows SGGS only). It has
 no effect on `sggs.dosanjhlabs.com`, which only ever has the one source.
 
 ## iOS Shortcuts
@@ -93,10 +94,10 @@ Shortcut just fetches a URL and gets back the shabad as plain text.
 2. Add **Get Contents of URL**, and set the URL to one of:
    - `https://sggs.dosanjhlabs.com/text` — Sri Guru Granth Sahib Ji
    - `https://dasam.dosanjhlabs.com/text` — Dasam Granth & Sarbloh Granth
-   - `https://hukamnama.dosanjhlabs.com/text` — all three
+   - `https://hukam.dosanjhlabs.com/text` — all three
    - Add `?src=aad`, `?src=dasam`, or `?src=sarbloh` to the combined URL to
      pin a Shortcut to just one granth (e.g.
-     `https://hukamnama.dosanjhlabs.com/text?src=sarbloh`).
+     `https://hukam.dosanjhlabs.com/text?src=sarbloh`).
 3. Add whatever you want to do with the result — **Show Result**, **Speak
    Text**, **Send Message**, a **Notification**, etc. — and feed it the
    output of the previous step (usually offered automatically as

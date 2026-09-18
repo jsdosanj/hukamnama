@@ -17,3 +17,7 @@ custom_domain = true
 [[routes]]
 pattern = "hukamnama.dosanjhlabs.com"
 custom_domain = true
+
+[[routes]]
+pattern = "hukam.dosanjhlabs.com"
+custom_domain = true

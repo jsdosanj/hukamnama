@@ -2,7 +2,7 @@
 //
 // sggs.dosanjhlabs.com     -> Sri Guru Granth Sahib Ji only
 // dasam.dosanjhlabs.com    -> Sri Dasam Granth Sahib Ji + Sri Sarbloh Granth Sahib Ji
-// hukamnama.dosanjhlabs.com -> all three, together, with a toggle
+// hukam.dosanjhlabs.com -> all three, together, with a toggle
 //
 // Routing is purely by request hostname, server-side, with no shared
 // client-side toggle state — each domain only ever has access to its own
@@ -12,7 +12,7 @@ const GURMUKHI_RE = /[਀-੿]/;
 
 // The border art and colour theme follow the ENTRY actually being shown,
 // not the site/domain — so the same shabad always looks the same everywhere,
-// and the combined hukamnama.dosanjhlabs.com can switch its frame per pick.
+// and the combined hukam.dosanjhlabs.com can switch its frame per pick.
 const SOURCE_THEME = {
   aad: { theme: "gold", border: "/borders/border-gold.webp" },
   dasam: { theme: "indigo", border: "/borders/border-indigo.webp" },
@@ -79,7 +79,7 @@ const SITES = {
     ],
   },
   all: {
-    hostnames: ["hukamnama.dosanjhlabs.com"],
+    hostnames: ["hukam.dosanjhlabs.com", "hukamnama.dosanjhlabs.com"],
     id: "all",
     title: "Sri Guru Granth Sahib, Dasam Granth & Sarbloh Granth",
     titleGurmukhi: "ਸ੍ਰੀ ਗੁਰੂ ਗ੍ਰੰਥ, ਦਸਮ ਗ੍ਰੰਥ ਤੇ ਸਰਬਲੋਹ ਗ੍ਰੰਥ",
@@ -410,7 +410,7 @@ function faqPageHtml() {
       <ul>
         <li><a href="https://sggs.dosanjhlabs.com">sggs.dosanjhlabs.com</a> &mdash; Sri Guru Granth Sahib Ji only</li>
         <li><a href="https://dasam.dosanjhlabs.com">dasam.dosanjhlabs.com</a> &mdash; Dasam Granth &amp; Sarbloh Granth</li>
-        <li><a href="https://hukamnama.dosanjhlabs.com">hukamnama.dosanjhlabs.com</a> &mdash; all three, together, separately, or any two at once, via the toggle at the top</li>
+        <li><a href="https://hukam.dosanjhlabs.com">hukam.dosanjhlabs.com</a> &mdash; all three, together, separately, or any two at once, via the toggle at the top</li>
       </ul>
     </div>
   </details>
@@ -432,7 +432,7 @@ function faqPageHtml() {
           <ul>
             <li><code>https://sggs.dosanjhlabs.com/text</code></li>
             <li><code>https://dasam.dosanjhlabs.com/text</code></li>
-            <li><code>https://hukamnama.dosanjhlabs.com/text</code> (add <code>?src=aad</code>, <code>?src=dasam</code>, or <code>?src=sarbloh</code> to pin it to one granth, or e.g. <code>?src=aad,dasam</code> for two)</li>
+            <li><code>https://hukam.dosanjhlabs.com/text</code> (add <code>?src=aad</code>, <code>?src=dasam</code>, or <code>?src=sarbloh</code> to pin it to one granth, or e.g. <code>?src=aad,dasam</code> for two)</li>
           </ul>
         </li>
         <li>Add another action &mdash; <strong>Show Result</strong>, <strong>Speak Text</strong>, <strong>Send Message</strong>, or <strong>Show Notification</strong> all work. When it asks for input, choose <strong>Contents of URL</strong> (offered automatically from the step above).</li>
@@ -449,7 +449,7 @@ function faqPageHtml() {
       <ul>
         <li>"Create a shortcut that fetches <code>https://sggs.dosanjhlabs.com/text</code> and shows me the result."</li>
         <li>"Create a shortcut that fetches <code>https://dasam.dosanjhlabs.com/text</code> and speaks the result out loud."</li>
-        <li>"Create a shortcut that fetches <code>https://hukamnama.dosanjhlabs.com/text?src=aad,dasam</code> and sends it to me as a notification every morning at 6am."</li>
+        <li>"Create a shortcut that fetches <code>https://hukam.dosanjhlabs.com/text?src=aad,dasam</code> and sends it to me as a notification every morning at 6am."</li>
       </ul>
       <p>Swap in whichever domain and <code>?src=</code> combination you want (see the step-by-step section above for the full list) &mdash; the prompt only needs to name the URL and what to do with the text it gets back.</p>
     </div>
@@ -530,7 +530,7 @@ function landingHtml() {
   <ul>
     <li><a href="https://sggs.dosanjhlabs.com">sggs.dosanjhlabs.com</a> — Sri Guru Granth Sahib Ji</li>
     <li><a href="https://dasam.dosanjhlabs.com">dasam.dosanjhlabs.com</a> — Sri Dasam Granth &amp; Sri Sarbloh Granth</li>
-    <li><a href="https://hukamnama.dosanjhlabs.com">hukamnama.dosanjhlabs.com</a> — all three granths, together</li>
+    <li><a href="https://hukam.dosanjhlabs.com">hukam.dosanjhlabs.com</a> — all three granths, together</li>
   </ul>
 </main>
 </body>

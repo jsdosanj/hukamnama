@@ -20,7 +20,7 @@
    ```sh
    curl -s https://sggs.dosanjhlabs.com/api/hukamnama | jq .source       # -> "aad"
    curl -s https://dasam.dosanjhlabs.com/api/hukamnama | jq .source      # -> "dasam" or "sarbloh"
-   curl -s https://hukamnama.dosanjhlabs.com/api/hukamnama | jq .source  # -> any of the three
+   curl -s https://hukam.dosanjhlabs.com/api/hukamnama | jq .source  # -> any of the three
    ```
 
 ## iOS Shortcuts

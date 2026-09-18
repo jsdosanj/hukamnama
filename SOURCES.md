@@ -128,7 +128,7 @@ word-for-word accuracy against the physical Granth.
 - `dasam.dosanjhlabs.com` draws from Sri Dasam Granth Sahib Ji and Sri
   Sarbloh Granth Sahib Ji combined by default, with a toggle to narrow to
   either one.
-- `hukamnama.dosanjhlabs.com` draws from all three granths combined by
+- `hukam.dosanjhlabs.com` draws from all three granths combined by
   default, with a toggle to narrow to any one of them.
 
 All three domains are served by the same Cloudflare Worker, which chooses

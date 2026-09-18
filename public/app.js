@@ -306,39 +306,69 @@
     });
   }
 
+  // Export resolution: try for 4K-equivalent width first, stepping down to
+  // 1440p- then 1080p-equivalent (the hard floor — never lower) if the
+  // estimated pixel area risks exceeding what older mobile browsers allow
+  // a single canvas to hold (iOS Safari has historically capped this
+  // around 16M px). Since wrap width changes with resolution, height is
+  // re-estimated at each tier rather than just scaled.
+  const BASE_WIDTH = 1080; // the width the original design proportions were tuned at
+  const RESOLUTION_TIERS = [3840, 2560, 1920]; // 4K, 1440p, 1080p-floor
+  const SAFE_CANVAS_AREA = 16_000_000;
+
+  function measureAtScale(measureCtx, width, scale) {
+    const paddingX = width * 0.12;
+    const contentWidth = width - paddingX * 2;
+    measureCtx.font = `600 ${34 * scale}px "Noto Serif Gurmukhi", serif`;
+    const lines = classifyLines(state.bodyText).filter((l) => l.type !== "blank");
+
+    let estHeight = 260 * scale; // header / citation area
+    const wrapped = [];
+    for (const line of lines) {
+      const font =
+        line.type === "gurmukhi"
+          ? `600 ${34 * scale}px "Noto Serif Gurmukhi", serif`
+          : `italic ${26 * scale}px "Cormorant Garamond", serif`;
+      measureCtx.font = font;
+      const wl = wrapText(measureCtx, line.text, contentWidth);
+      const lineHeight = (line.type === "gurmukhi" ? 54 : 40) * scale;
+      for (const w of wl) {
+        wrapped.push({ text: w, font, lineHeight, type: line.type });
+        estHeight += lineHeight;
+      }
+      estHeight += 12 * scale;
+    }
+    estHeight += 160 * scale; // footer
+
+    return { wrapped, height: Math.max(estHeight, 900 * scale), paddingX, contentWidth };
+  }
+
+  function pickResolution(measureCtx) {
+    let fallback = null;
+    for (const width of RESOLUTION_TIERS) {
+      const scale = width / BASE_WIDTH;
+      const layout = measureAtScale(measureCtx, width, scale);
+      const candidate = { width, scale, ...layout };
+      if (!fallback) fallback = candidate; // smallest tier seen so far == last in list == the 1080p floor
+      if (width * layout.height <= SAFE_CANVAS_AREA) {
+        return candidate;
+      }
+      fallback = candidate;
+    }
+    return fallback; // every tier exceeded the safe area — use the smallest (1080p) anyway, per the hard floor
+  }
+
   async function buildShareCanvas() {
     await ensureFontsReady();
     const frameImg = document.getElementById("frame-img");
     await ensureImageLoaded(frameImg);
     const canvas = document.getElementById("export-canvas");
-    const width = 1080;
-    const paddingX = width * 0.12;
-    const contentWidth = width - paddingX * 2;
-
     const measureCtx = canvas.getContext("2d");
-    measureCtx.font = '600 34px "Noto Serif Gurmukhi", serif';
-    const lines = classifyLines(state.bodyText).filter((l) => l.type !== "blank");
 
-    let estHeight = 260; // header / citation area
-    const wrapped = [];
-    for (const line of lines) {
-      const font =
-        line.type === "gurmukhi"
-          ? '600 34px "Noto Serif Gurmukhi", serif'
-          : 'italic 26px "Cormorant Garamond", serif';
-      measureCtx.font = font;
-      const wl = wrapText(measureCtx, line.text, contentWidth);
-      const lineHeight = line.type === "gurmukhi" ? 54 : 40;
-      for (const w of wl) {
-        wrapped.push({ text: w, font, lineHeight, type: line.type });
-        estHeight += lineHeight;
-      }
-      estHeight += 12;
-    }
-    estHeight += 160; // footer
+    const { width, scale, wrapped, height } = pickResolution(measureCtx);
 
     canvas.width = width;
-    canvas.height = Math.max(estHeight, 900);
+    canvas.height = height;
     const ctx = canvas.getContext("2d");
 
     if (frameImg.complete && frameImg.naturalWidth) {
@@ -353,20 +383,20 @@
     const cardW = width * 0.8;
     const cardH = canvas.height * 0.82;
     ctx.fillStyle = "rgba(255,253,246,0.95)";
-    roundRect(ctx, cardX, cardY, cardW, cardH, 24);
+    roundRect(ctx, cardX, cardY, cardW, cardH, 24 * scale);
     ctx.fill();
 
     const accentColors = { gold: "#7a1f2b", indigo: "#8a3324", accent: "#1a3a8f" };
     ctx.textAlign = "center";
     ctx.fillStyle = accentColors[state.meta.theme] || "#7a1f2b";
-    ctx.font = '600 24px "Noto Serif Gurmukhi", serif';
-    let y = cardY + 60;
+    ctx.font = `600 ${24 * scale}px "Noto Serif Gurmukhi", serif`;
+    let y = cardY + 60 * scale;
     const citationLines = wrapText(ctx, state.meta.citation || "", cardW * 0.85);
     for (const cl of citationLines) {
       ctx.fillText(cl, width / 2, y);
-      y += 32;
+      y += 32 * scale;
     }
-    y += 24;
+    y += 24 * scale;
 
     for (const w of wrapped) {
       ctx.font = w.font;
