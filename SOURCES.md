@@ -4,18 +4,25 @@ This app serves random Vaaks (Hukamnamas) from three granths. This document
 records where each dataset came from, so anyone can trace and re-verify the
 text.
 
-## Sri Guru Granth Sahib Ji (`public/data/aad.json`)
+## Sri Guru Granth Sahib Ji (`public/data/aad.json` + `aad.pu.ss.json` / `aad.pu.ft.json`)
 
-Gurmukhi text paired line-by-line with English translation, carried over
-from the original `aad_hukamnama` repository's `adi_maharaj_sbds.js`
-(5,538 entries, keyed 1–5540).
+Verse-by-verse Gurmukhi from banidb.com's shabad database (5,538 entries,
+keyed 1–5540). English translation is Bhai Manmohan Singh's (`ms`).
+Punjabi commentary is offered as two selectable, separately-loaded layers:
+Professor Sahib Singh's *Sri Guru Granth Sahib Darpan* (`ss`) and the
+classical Fareedkot Teeka (`ft`) — both fetched from banidb and split into
+their own static assets since Cloudflare's 25 MiB per-file limit doesn't
+allow storing both alongside the base text in one JSON file. **Dr. Sant
+Singh Khalsa's English translation (`ssk`) is deliberately not included
+anywhere in this dataset or on this site.**
 
-## Sri Dasam Granth Sahib Ji (`public/data/dasam.json`)
+## Sri Dasam Granth Sahib Ji (`public/data/dasam.json` + `dasam.pu.ss.json`)
 
-Gurmukhi text paired line-by-line with English translation, carried over
-from the original repositories' `dasam_sbd.js` (5,407 entries, keyed
-7402–12808). Covers the full Dasam Bani corpus, including Charitropakhyan,
-per an explicit decision to keep the corpus unfiltered on this site.
+Verse-by-verse Gurmukhi from banidb.com (5,407 entries, keyed 7402–12808).
+English translation is banidb's own (`bdb`). A verse-by-verse Punjabi
+steek (`ss`) is offered as a selectable, separately-loaded layer. Covers
+the full Dasam Bani corpus, including Charitropakhyan, per an explicit
+decision to keep the corpus unfiltered on this site.
 
 ## Verification: SGGS + Dasam Granth against banidb.com
 
@@ -49,23 +56,20 @@ pass, not to errors in this app's data — which is exactly what the
 banidb cross-check (the cleaner, curated source) already confirmed at
 100% / 99.96%.
 
-### Available alternate translations (not yet integrated)
+### Translations now integrated
 
-banidb carries more than one translation per verse for both granths,
-already aligned to the same shabad/verse IDs used here, which would be
-straightforward to add later:
+All of the following are live and selectable from the "Translations &
+display" panel under each hukamnama (see `README.md`):
 
-**SGGS** — English: Dr. Sant Singh Khalsa (`ssk`, the wording currently
-baked into `aad.json`), Bhai Manmohan Singh (`bdb`, banidb's own default —
-identical to `ssk` for many verses), and Dr. Manmohan Singh (`ms`, a
-distinctly-worded alternate). Punjabi: **Professor Sahib Singh's *Sri Guru
-Granth Sahib Darpan*** (`ss`, verse-by-verse exegesis, confirmed present
-and substantive across a spread sample) and the classical **Fareedkot
-Teeka** (`ft`).
+**SGGS** — English: Bhai Manmohan Singh (`ms`). Punjabi: **Professor Sahib
+Singh's *Sri Guru Granth Sahib Darpan*** (`ss`, verse-by-verse exegesis,
+fetched for all 5,538 shabads) and the classical **Fareedkot Teeka**
+(`ft`). Dr. Sant Singh Khalsa's English translation (`ssk`) was
+considered and is **intentionally excluded** from this site.
 
-**Dasam Granth** — English: only banidb's own default (`bdb`); no ssk/ms
+**Dasam Granth** — English: banidb's own default (`bdb`); no ssk/ms
 equivalent exists for Dasam Granth. Punjabi: a verse-by-verse steek under
-the same `ss` key (confirmed present and substantive), though it is not
+the same `ss` key (fetched for all 5,407 shabads), though it is not
 established whether this is also Professor Sahib Singh's work specifically
 for Dasam Granth or a different contributor banidb files under the same
 key — `ft` (Fareedkot Teeka) is present in the API shape for Dasam Granth
@@ -75,7 +79,7 @@ but empty in practice, since that Teeka only ever covered SGGS.
 scanned works, but as individual booklets (Japji Steek, Sidh Gosht Steek,
 Slok Guru Angad Sahib Steek, Nitnem Steek, etc.) rather than a complete
 verse-aligned SGGS Darpan — banidb's `ss` key is the more complete,
-already-structured option if this gets added.
+already-structured option, and is what this site actually uses.
 
 ## Sri Sarbloh Granth Sahib Ji (`public/data/sarbloh.json`)
 
@@ -128,8 +132,10 @@ word-for-word accuracy against the physical Granth.
 - `dasam.dosanjhlabs.com` draws from Sri Dasam Granth Sahib Ji and Sri
   Sarbloh Granth Sahib Ji combined by default, with a toggle to narrow to
   either one.
-- `hukam.dosanjhlabs.com` draws from all three granths combined by
-  default, with a toggle to narrow to any one of them.
+- `sarbloh.dosanjhlabs.com` draws only from Sri Sarbloh Granth Sahib Ji.
+- `hukam.dosanjhlabs.com` shows one independent random pick from each of
+  the three granths side by side by default, with a dropdown to narrow to
+  any single granth or pair instead.
 
 All three domains are served by the same Cloudflare Worker, which chooses
 the dataset purely from the request's hostname — there is no shared
