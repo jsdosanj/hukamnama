@@ -701,9 +701,12 @@ body {
   flex-direction: column;
 }
 
-.triptych .letter-frame-col[data-source="dasam"] { flex: 0 1 30%; }
-.triptych .letter-frame-col[data-source="aad"] { flex: 0 1 40%; }
-.triptych .letter-frame-col[data-source="sarbloh"] { flex: 0 1 30%; }
+/* Column width is set per-instance via the --col-width custom property
+   (inline on the element) rather than a literal inline flex value, so the
+   mobile stacking rule below — a plain stylesheet rule — can still win at
+   narrow widths. A custom property's cascade doesn't have the "inline
+   always wins" problem a literal inline style value would. */
+.triptych .letter-frame-col { flex: 0 1 var(--col-width, 33%); }
 
 .triptych .col-label {
   font-family: var(--font-ui);

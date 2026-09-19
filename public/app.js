@@ -468,7 +468,9 @@
         newBtn.disabled = true;
         setStatus("Fetching new hukamnamas…");
         try {
-          const res = await fetch("/api/triptych", { headers: { accept: "application/json" } });
+          const url = new URL("/api/triptych", location.origin);
+          url.searchParams.set("src", order.join(","));
+          const res = await fetch(url.toString(), { headers: { accept: "application/json" } });
           if (!res.ok) throw new Error("Network error");
           const data = await res.json();
           order.forEach((source) => renderColumn(source, data[source]));
