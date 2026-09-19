@@ -429,7 +429,12 @@ function sourceControlHtml(site, activeSources) {
     const renderOption = (o) => {
       const key = o.keys.join(",");
       const isActive = [...o.keys].sort().join(",") === activeSet;
-      return `<option value="${encodeURIComponent(key)}"${isActive ? " selected" : ""}>${escapeHtml(o.label)}</option>`;
+      // A GET <form>'s browser-side submission already URL-encodes an
+      // <option>'s value when building the query string — pre-encoding it
+      // here (as the href-based pill toggle correctly does) would double
+      // it, turning "aad,dasam" into a literal "aad%2Cdasam" query value
+      // that the server-side comma-split then fails to parse.
+      return `<option value="${escapeHtml(key)}"${isActive ? " selected" : ""}>${escapeHtml(o.label)}</option>`;
     };
     const body = groups
       .map((g) =>
