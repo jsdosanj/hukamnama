@@ -594,9 +594,12 @@ function pageHtml({ site, entry, activeSources, prefs }) {
 </html>`;
 }
 
-// ---- "All Three" triptych: Dasam (30%, left) / SGGS (40%, middle) /
-// Sarbloh (30%, right), each an independent random pick from its own
-// granth rather than one pick from the union. ----
+// ---- Side-by-side gallery view: shown whenever the hub's dropdown has
+// more than one source active — "All Three" (Dasam 30% left / SGGS 40%
+// middle / Sarbloh 30% right) as well as any "Two Granths" pair (50/50,
+// or 55/45 favouring SGGS when it's one of the two) — each column an
+// independent random pick from its own granth rather than one pick from
+// the union. ----
 
 const TRIPTYCH_ORDER = ["dasam", "aad", "sarbloh"];
 const TRIPTYCH_LABEL = {
@@ -605,9 +608,21 @@ const TRIPTYCH_LABEL = {
   sarbloh: "Sri Sarbloh Granth Sahib Ji",
 };
 
-async function pickTriptych(env) {
+function galleryColumnWidths(sources) {
+  if (sources.length === 3) return { dasam: 30, aad: 40, sarbloh: 30 };
+  if (sources.length === 2 && sources.includes("aad")) {
+    const widths = { aad: 55 };
+    widths[sources.find((s) => s !== "aad")] = 45;
+    return widths;
+  }
+  const widths = {};
+  for (const s of sources) widths[s] = 100 / sources.length;
+  return widths;
+}
+
+async function pickGallery(env, sources) {
   const entries = {};
-  for (const source of TRIPTYCH_ORDER) {
+  for (const source of sources) {
     const keys = await getSortedKeys(env, source);
     const id = keys[Math.floor(Math.random() * keys.length)];
     const prefs = defaultTranslationPrefs(source);
@@ -616,11 +631,11 @@ async function pickTriptych(env) {
   return entries;
 }
 
-function triptychColumnHtml(source, entry) {
+function triptychColumnHtml(source, entry, widthPct) {
   const { theme, border } = SOURCE_THEME[source];
   const verseHtml = verseHtmlFor(entry);
   return `
-    <div class="letter-frame-col theme-${theme}" data-source="${source}">
+    <div class="letter-frame-col theme-${theme}" data-source="${source}" style="--col-width:${widthPct}%">
       <p class="col-label">${escapeHtml(TRIPTYCH_LABEL[source])}</p>
       <section class="letter-frame" style="--frame-image:url('${border}')">
         <div class="letter-inner">
@@ -631,17 +646,18 @@ function triptychColumnHtml(source, entry) {
     </div>`;
 }
 
-function triptychResponse(entries) {
+function triptychResponse(entries, sources) {
   const out = {};
-  for (const source of TRIPTYCH_ORDER) {
+  for (const source of sources) {
     out[source] = entryResponse(entries[source]);
   }
   return out;
 }
 
-function triptychPageHtml({ site, entries }) {
-  const rawText = TRIPTYCH_ORDER.map((s) => `${entries[s].citation}\n\n${entries[s].text}`).join("\n\n---\n\n");
-  const columns = TRIPTYCH_ORDER.map((s) => triptychColumnHtml(s, entries[s])).join("\n");
+function triptychPageHtml({ site, entries, sources }) {
+  const widths = galleryColumnWidths(sources);
+  const rawText = sources.map((s) => `${entries[s].citation}\n\n${entries[s].text}`).join("\n\n---\n\n");
+  const columns = sources.map((s) => triptychColumnHtml(s, entries[s], widths[s])).join("\n");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -659,7 +675,7 @@ function triptychPageHtml({ site, entries }) {
 <link rel="apple-touch-icon" href="/icons/icon-192.png">
 <link rel="icon" href="/icons/icon-192.png">
 <script type="application/json" id="raw-text">${JSON.stringify(rawText)}</script>
-<script type="application/json" id="entry-meta">${JSON.stringify({ triptych: true, sources: TRIPTYCH_ORDER })}</script>
+<script type="application/json" id="entry-meta">${JSON.stringify({ triptych: true, sources })}</script>
 </head>
 <body class="theme-gold">
   ${heroCarouselHtml()}
@@ -670,7 +686,7 @@ function triptychPageHtml({ site, entries }) {
       <p class="site-title-en">${escapeHtml(site.title)}</p>
     </header>
 
-    ${sourceControlHtml(site, site.sources)}
+    ${sourceControlHtml(site, sources)}
 
     <div class="triptych" id="triptych">
       ${columns}
@@ -857,9 +873,12 @@ async function handleApi(env, url, site) {
   return Response.json({ ...entryResponse(entry), prefs });
 }
 
-async function handleTriptych(env) {
-  const entries = await pickTriptych(env);
-  return Response.json(triptychResponse(entries));
+async function handleTriptych(env, url, site) {
+  const sourcesParam = url.searchParams.get("src");
+  const activeSources = parseSourcesParam(site, sourcesParam);
+  const sources = TRIPTYCH_ORDER.filter((s) => activeSources.includes(s));
+  const entries = await pickGallery(env, sources);
+  return Response.json(triptychResponse(entries, sources));
 }
 
 async function handleNeighbor(env, url, site, direction) {
@@ -955,7 +974,7 @@ export default {
       return handleApi(env, url, site);
     }
     if (url.pathname === "/api/triptych") {
-      return handleTriptych(env);
+      return handleTriptych(env, url, site);
     }
     if (url.pathname === "/api/translation") {
       return handleTranslation(env, url);
@@ -987,11 +1006,15 @@ export default {
       const sourcesParam = url.searchParams.get("src");
       const activeSources = parseSourcesParam(site, sourcesParam);
 
-      // The hub domain's default ("All Three") renders the side-by-side
-      // triptych instead of a single card — see pickTriptych/triptychPageHtml.
-      if (site.toggle === "dropdown" && activeSources.length === site.sources.length && !url.searchParams.get("id")) {
-        const entries = await pickTriptych(env);
-        return new Response(triptychPageHtml({ site, entries }), {
+      // The hub domain renders a side-by-side gallery — one independent
+      // random pick per selected granth — whenever more than one source is
+      // active (the "All Three" default, or any "Two Granths" pick), rather
+      // than a single card with one random pick from the union. See
+      // pickGallery/triptychPageHtml.
+      if (site.toggle === "dropdown" && activeSources.length > 1 && !url.searchParams.get("id")) {
+        const gallerySources = TRIPTYCH_ORDER.filter((s) => activeSources.includes(s));
+        const entries = await pickGallery(env, gallerySources);
+        return new Response(triptychPageHtml({ site, entries, sources: gallerySources }), {
           headers: { "content-type": "text/html; charset=utf-8" },
         });
       }
