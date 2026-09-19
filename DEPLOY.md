@@ -2,12 +2,12 @@
 
 1. `wrangler deploy`.
 
-   The three custom hostnames are declared as `[[routes]]` entries in
-   `wrangler.toml` with `custom_domain = true`, so a plain `wrangler
+   The custom hostnames are declared as `routes` entries in
+   `wrangler.jsonc` with `custom_domain: true`, so a plain `wrangler
    deploy` provisions the DNS record and TLS certificate for each one
    automatically (no manual DNS edits, no separate API calls needed) —
    matching how the account's other `*.dosanjhlabs.com` subdomains are set
-   up. Adding a fourth domain later is just another `[[routes]]` block.
+   up. Adding another domain later is just another entry in that array.
 
    (The Cloudflare API token used for this needs Workers Scripts edit
    access; it does **not** need — and in practice may not have — direct
@@ -15,13 +15,18 @@
    deploy` provisions custom domains through a different path than calling
    those endpoints directly.)
 
-2. Verify all three domains serve isolated content:
+2. Verify all four domains serve isolated content:
 
    ```sh
-   curl -s https://sggs.dosanjhlabs.com/api/hukamnama | jq .source       # -> "aad"
-   curl -s https://dasam.dosanjhlabs.com/api/hukamnama | jq .source      # -> "dasam" or "sarbloh"
-   curl -s https://hukam.dosanjhlabs.com/api/hukamnama | jq .source  # -> any of the three
+   curl -s https://sggs.dosanjhlabs.com/api/hukamnama | jq .source      # -> "aad"
+   curl -s https://dasam.dosanjhlabs.com/api/hukamnama | jq .source     # -> "dasam" or "sarbloh"
+   curl -s https://sarbloh.dosanjhlabs.com/api/hukamnama | jq .source   # -> "sarbloh"
+   curl -s https://hukam.dosanjhlabs.com/api/triptych | jq 'keys'       # -> ["aad","dasam","sarbloh"]
    ```
+
+   Worker logs (invocation logs + tail-able request logs) are enabled via
+   `observability.logs` in `wrangler.jsonc` — visible under the Worker's
+   **Logs** tab in the Cloudflare dashboard, or via `wrangler tail`.
 
 ## iOS Shortcuts
 

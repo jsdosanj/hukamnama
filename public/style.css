@@ -9,13 +9,33 @@
   --indigo: #232a5c;
   --terracotta: #8a3324;
   --royal-blue: #1a3a8f;
-  --shadow: rgba(38, 32, 25, 0.18);
-  --carousel-fade: #fffdf6;
+
+  /* Guru Gobind Singh Ji gave the Khalsa three colours — blue, white, and
+     basanti (saffron) yellow — so the site chrome (everything outside the
+     illuminated parchment card itself) is built from this palette rather
+     than the earlier brown/parchment scheme. */
+  --page-bg-top: #2a4faf;
+  --page-bg-mid: #16265f;
+  --page-bg-deep: #0a1230;
+  --basanti: #f0b429;
+  --basanti-soft: #f7cf6b;
+  --on-blue: #f8f5ec;
+  --on-blue-soft: rgba(248, 245, 236, 0.76);
+  --on-blue-faint: rgba(248, 245, 236, 0.4);
+
+  --shadow: rgba(6, 10, 30, 0.35);
+  --carousel-fade: var(--page-bg-top);
   --radius-lg: 22px;
   --radius-md: 14px;
   --font-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-serif: "Cormorant Garamond", "Iowan Old Style", Georgia, serif;
-  --font-gurmukhi: "Noto Serif Gurmukhi", "Noto Sans Gurmukhi", serif;
+  /* Mukta Mahee is a Google Font drawn specifically for Gurmukhi (part of
+     the Ek Type "Mukta" family) rather than a generic pan-Indic Unicode
+     face — its rakar/vakar/haha subjoined strokes (the hook that turns
+     ਬਰਹਮ into ਬ੍ਰਹਮ) render as a clearly separate, larger mark instead of
+     the near-invisible sliver Noto Serif/Sans Gurmukhi, Baloo Paaji 2 and
+     Mukta (the Devanagari member of the same family) all produced. */
+  --font-gurmukhi: "Mukta Mahee", "Noto Serif Gurmukhi", "Noto Sans Gurmukhi", serif;
   --accent: var(--gold);
   --accent-strong: var(--maroon);
 }
@@ -38,12 +58,13 @@ html, body {
 }
 
 html {
-  background: #fffdf6;
+  background: var(--page-bg-deep);
 }
 
 body {
-  background: radial-gradient(circle at top, #fffdf6 0%, var(--parchment) 45%, var(--parchment-deep) 100%);
-  color: var(--ink);
+  background: radial-gradient(circle at top, var(--page-bg-top) 0%, var(--page-bg-mid) 48%, var(--page-bg-deep) 100%);
+  background-attachment: fixed;
+  color: var(--on-blue);
   font-family: var(--font-serif);
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
@@ -69,18 +90,28 @@ body {
 }
 
 /* Hero carousel — bleeds full-bleed edge to edge and under the status
-   bar/notch (the safe-area inset is added to its height rather than as
-   padding, so the image itself extends up there, not empty space). Only
-   two slides are ever loaded at once (see app.js); the rest sit inert
-   with data-src until their turn. A soft gradient at the base blends it
-   into the page background so it reads as one continuous surface rather
-   than a photo pasted on top. */
+   bar/notch (the safe-area inset is added on top of an aspect-ratio-driven
+   height rather than a fixed clamp: a fixed max-height regardless of
+   viewport width let the box's aspect ratio run away from the banner
+   photos' own ~1.4–2.5:1 ratio on wide/short desktop windows, so
+   object-fit:cover cropped hard into the top of every image — the
+   "squished" look. Sizing the box off its own aspect ratio keeps the crop
+   proportional to what the photos actually look like at any width, and
+   object-position keeps the crop weighted toward the upper part of the
+   frame (where these paintings put their architecture/subjects) rather
+   than centring it. Only two slides are ever loaded at once (see app.js);
+   the rest sit inert with data-src until their turn. A soft gradient at
+   the base blends it into the page background so it reads as one
+   continuous surface rather than a photo pasted on top. */
 .hero-carousel {
   position: relative;
   width: 100%;
-  height: calc(clamp(190px, 34vh, 340px) + env(safe-area-inset-top));
+  aspect-ratio: 2.6 / 1;
+  min-height: calc(190px + env(safe-area-inset-top));
+  max-height: calc(420px + env(safe-area-inset-top));
+  padding-top: env(safe-area-inset-top);
   overflow: hidden;
-  background: #14110d;
+  background: var(--page-bg-deep);
 }
 
 .hero-slides {
@@ -94,6 +125,7 @@ body {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: center 32%;
   opacity: 0;
   transition: opacity 1.4s ease;
   will-change: opacity;
@@ -107,7 +139,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.12) 0%, rgba(0, 0, 0, 0) 45%, var(--carousel-fade) 96%);
+  background: linear-gradient(to bottom, rgba(6, 10, 30, 0.22) 0%, rgba(6, 10, 30, 0) 45%, var(--carousel-fade) 96%);
   pointer-events: none;
 }
 
@@ -130,14 +162,37 @@ body {
   background-clip: content-box;
   border-radius: 999px;
   border: none;
-  background-color: rgba(255, 255, 255, 0.45);
+  background-color: rgba(255, 255, 255, 0.4);
   cursor: pointer;
   transition: background-color 0.25s ease, transform 0.25s ease;
 }
 
 .hero-dot.active {
-  background-color: #fffdf6;
+  background-color: var(--basanti);
   transform: scale(1.3);
+}
+
+/* A slimmer version of the same carousel, reused as a banner strip inside
+   long-form pages (FAQ / Sources) rather than only at the top of the
+   hukamnama page. */
+.banner-strip {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 4.5 / 1;
+  min-height: 90px;
+  max-height: 180px;
+  overflow: hidden;
+  border-radius: var(--radius-md);
+  margin: 28px 0;
+  box-shadow: 0 14px 34px var(--shadow);
+}
+
+.banner-strip img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 32%;
+  display: block;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -156,7 +211,7 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.14em;
   font-size: 11px;
-  color: var(--accent-strong);
+  color: var(--basanti);
   margin: 0 0 10px;
 }
 
@@ -165,23 +220,80 @@ body {
   font-weight: 600;
   font-size: clamp(22px, 5vw, 30px);
   margin: 0 0 4px;
-  color: var(--ink);
+  color: var(--on-blue);
 }
 
 .site-title-en {
   font-family: var(--font-serif);
   font-style: italic;
   font-size: 16px;
-  color: var(--ink-soft);
+  color: var(--on-blue-soft);
   margin: 0;
 }
 
+/* ---- Source selector: a native <select> dropdown rather than a pill
+   toggle, so the growing set of options (single granth / any pair / all
+   three) stays compact and legible on every screen size. ---- */
+.source-select-wrap {
+  position: relative;
+  margin-bottom: 22px;
+  max-width: 320px;
+  width: 100%;
+}
+
+.source-select {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  font-family: var(--font-ui);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--on-blue);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  padding: 12px 40px 12px 20px;
+  cursor: pointer;
+  text-align: center;
+  text-align-last: center;
+  min-height: 44px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.source-select:hover,
+.source-select:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.4);
+  outline: none;
+}
+
+.source-select option {
+  color: var(--ink);
+  background: var(--parchment);
+}
+
+.source-select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  width: 9px;
+  height: 9px;
+  border-right: 2px solid var(--basanti);
+  border-bottom: 2px solid var(--basanti);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+
+/* Legacy pill toggle — still used where a handful of options fit comfortably
+   (e.g. Dasam/Sarbloh's 3-way choice). */
 .source-toggle {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  background: rgba(0,0,0,0.05);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   padding: 6px;
   border-radius: 20px;
   margin-bottom: 22px;
@@ -194,7 +306,7 @@ body {
   padding: 8px 14px;
   border-radius: 999px;
   text-decoration: none;
-  color: var(--ink-soft);
+  color: var(--on-blue-soft);
   white-space: nowrap;
   transition: background 0.2s ease, color 0.2s ease;
 }
@@ -233,13 +345,22 @@ body {
   border-image-slice: 43% 9% 11% fill;
 }
 
+/* The accent (Sarbloh) art is an arch design whose ornate corner shoulders
+   sit further inward than the other two borders' — 14%/28px was slicing
+   the corner box too small, so most of the shoulder's floral/vine detail
+   fell into the horizontally-*stretched* top-middle strip instead of the
+   fixed corner tile, visibly warping into disconnected "floating flower"
+   smears on any shabad taller than a couple of lines. Widening the
+   left/right slice (and border width to match) moves the whole shoulder
+   into the unstretched corner tile. Verified with a local border-image
+   render at several content heights before and after. */
 .theme-accent .letter-frame {
-  border-width: 70px 28px 32px;
-  border-image-slice: 39% 14% 11% fill;
+  border-width: 70px 45px 32px;
+  border-image-slice: 39% 40% 11% fill;
 }
 
 .letter-inner {
-  background: rgba(255, 253, 246, 0.96);
+  background: rgba(255, 253, 246, 0.97);
   border-radius: var(--radius-md);
   padding: 28px clamp(16px, 4vw, 36px) 34px;
   box-shadow: 0 18px 44px var(--shadow);
@@ -281,6 +402,13 @@ body {
   margin: 0 0 18px;
 }
 
+.verse-block .verse.larivaar {
+  /* Larivaar joins every word into one continuous run with no spaces,
+     matching how gurbani is printed "in a row" — the reading aid is the
+     rhythm of matras, not word boundaries. */
+  word-spacing: -0.24em;
+}
+
 .verse-block .translation {
   font-family: var(--font-serif);
   font-style: italic;
@@ -288,6 +416,16 @@ body {
   line-height: 1.7;
   color: var(--ink-soft);
   margin: 0 0 26px;
+}
+
+.verse-block .translation-alt {
+  font-family: var(--font-gurmukhi);
+  font-style: normal;
+  font-weight: 500;
+  font-size: clamp(14px, 2.3vw, 16px);
+  line-height: 1.7;
+  color: var(--ink-soft);
+  margin: -18px 0 26px;
 }
 
 .controls {
@@ -328,30 +466,102 @@ body {
 }
 
 .btn-outline {
-  background: transparent;
-  border-color: rgba(38,32,25,0.25);
-  color: var(--ink);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(248, 245, 236, 0.3);
+  color: var(--on-blue);
 }
 
 .btn-ghost {
   background: transparent;
   border: none;
-  color: var(--accent-strong);
+  color: var(--basanti-soft);
+}
+
+.btn-toggle {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(248, 245, 236, 0.3);
+  color: var(--on-blue-soft);
+}
+
+.btn-toggle.active {
+  background: var(--basanti);
+  border-color: var(--basanti);
+  color: #2a1d00;
 }
 
 .status {
   font-family: var(--font-ui);
   font-size: 12.5px;
-  color: var(--ink-soft);
+  color: var(--on-blue-soft);
   min-height: 16px;
   margin: 0;
+  text-align: center;
+}
+
+/* ---- Translation / display settings panel ---- */
+.settings-panel {
+  width: 100%;
+  margin-top: 8px;
+  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--radius-md);
+  padding: 16px 18px;
+  text-align: left;
+}
+
+.settings-panel summary {
+  font-family: var(--font-ui);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--on-blue);
+  cursor: pointer;
+  list-style: none;
+}
+
+.settings-panel summary::-webkit-details-marker { display: none; }
+
+.settings-group {
+  margin-top: 14px;
+}
+
+.settings-group h3 {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-blue-faint);
+  margin: 0 0 8px;
+}
+
+.settings-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.settings-chip {
+  font-family: var(--font-ui);
+  font-size: 12.5px;
+  padding: 7px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: transparent;
+  color: var(--on-blue-soft);
+  cursor: pointer;
+}
+
+.settings-chip.active {
+  background: var(--basanti);
+  border-color: var(--basanti);
+  color: #2a1d00;
+  font-weight: 600;
 }
 
 .site-footer {
   margin-top: 46px;
   text-align: center;
   font-family: var(--font-gurmukhi);
-  color: var(--ink-soft);
+  color: var(--on-blue-soft);
   font-size: 14px;
 }
 
@@ -362,33 +572,46 @@ body {
 }
 
 .footnote a {
-  color: var(--ink-soft);
+  color: var(--basanti-soft);
 }
 
-.sources-page {
+.sources-page,
+.faq-page,
+.landing-page {
   text-align: left;
   font-family: var(--font-serif);
+  color: var(--on-blue-soft);
   /* These pages have no hero carousel bleeding under the status bar, so
      they need their own top safe-area allowance. */
   padding-top: max(32px, calc(env(safe-area-inset-top) + 12px));
 }
 
-.sources-page h1 {
+.sources-page h1,
+.faq-page h1,
+.landing-page h1 {
   font-family: var(--font-gurmukhi);
+  color: var(--on-blue);
+}
+
+.sources-page h2 {
+  color: var(--on-blue);
 }
 
 .sources-page section {
   margin-bottom: 22px;
 }
 
+.sources-page a,
+.faq-page a,
+.landing-page a {
+  color: var(--basanti-soft);
+}
+
 .faq-page {
-  text-align: left;
-  font-family: var(--font-serif);
   max-width: 640px;
 }
 
 .faq-page h1 {
-  font-family: var(--font-gurmukhi);
   text-align: center;
   margin-top: 0;
 }
@@ -402,7 +625,7 @@ body {
 }
 
 .faq-page details {
-  border-bottom: 1px solid rgba(38, 32, 25, 0.12);
+  border-bottom: 1px solid rgba(248, 245, 236, 0.16);
   padding: 16px 2px;
 }
 
@@ -415,7 +638,7 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: var(--ink);
+  color: var(--on-blue);
 }
 
 .faq-page summary::-webkit-details-marker {
@@ -425,7 +648,7 @@ body {
 .faq-page summary::after {
   content: "+";
   font-size: 20px;
-  color: var(--accent-strong);
+  color: var(--basanti);
   margin-left: 12px;
   transition: transform 0.2s ease;
 }
@@ -436,7 +659,7 @@ body {
 
 .faq-body {
   margin-top: 12px;
-  color: var(--ink-soft);
+  color: var(--on-blue-soft);
   font-size: 16px;
   line-height: 1.6;
 }
@@ -444,7 +667,7 @@ body {
 .faq-body code {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
   font-size: 0.9em;
-  background: rgba(38, 32, 25, 0.08);
+  background: rgba(248, 245, 236, 0.14);
   padding: 1px 6px;
   border-radius: 6px;
 }
@@ -458,6 +681,65 @@ body {
   margin-bottom: 8px;
 }
 
+.resource-desc {
+  display: block;
+  font-size: 13.5px;
+  color: var(--on-blue-faint);
+  margin-top: 2px;
+}
+
+/* ---- "All three side by side" layout on hukam.dosanjhlabs.com ---- */
+.triptych {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+  align-items: flex-start;
+}
+
+.triptych .letter-frame-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.triptych .letter-frame-col[data-source="dasam"] { flex: 0 1 30%; }
+.triptych .letter-frame-col[data-source="aad"] { flex: 0 1 40%; }
+.triptych .letter-frame-col[data-source="sarbloh"] { flex: 0 1 30%; }
+
+.triptych .col-label {
+  font-family: var(--font-ui);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--on-blue-faint);
+  text-align: center;
+  margin: 0 0 8px;
+}
+
+.triptych .letter-inner {
+  padding: 18px 12px 22px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.triptych .verse-block .verse { font-size: clamp(14px, 1.6vw, 17px); line-height: 1.7; }
+.triptych .verse-block .translation { font-size: clamp(11px, 1.2vw, 13px); }
+.triptych .citation { font-size: 12px; margin-bottom: 12px; }
+
+@media (max-width: 760px) {
+  .triptych {
+    flex-direction: column;
+  }
+  .triptych .letter-frame-col[data-source="dasam"],
+  .triptych .letter-frame-col[data-source="aad"],
+  .triptych .letter-frame-col[data-source="sarbloh"] {
+    flex: 1 1 auto;
+    width: 100%;
+  }
+  .triptych .letter-inner {
+    max-height: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .btn { transition: none; }
 }
@@ -465,39 +747,6 @@ body {
 @media (max-width: 420px) {
   .theme-gold .letter-frame { border-width: 32px 22px; }
   .theme-indigo .letter-frame { border-width: 56px 20px 24px; }
-  .theme-accent .letter-frame { border-width: 50px 20px 22px; }
+  .theme-accent .letter-frame { border-width: 50px 32px 22px; }
   .letter-inner { padding: 22px 14px 28px; }
-}
-
-/* Dark mode — the letter card itself always stays parchment-toned (a lit
-   page in a dark room), so only the chrome around it inverts. This block
-   is intentionally last so it wins cascade ties against the base rules
-   above it (same selector specificity, later source order). */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink: #f3ead2;
-    --ink-soft: #cabf9d;
-    --gold: #e0b84a;
-    --gold-bright: #f0cf6b;
-    --carousel-fade: #23201c;
-  }
-  body {
-    background: radial-gradient(circle at top, #23201c 0%, #17140f 55%, #0f0d0a 100%);
-    color: var(--ink);
-  }
-  .letter-inner {
-    background: rgba(255, 253, 246, 0.97);
-    box-shadow: 0 30px 80px rgba(0,0,0,0.55);
-  }
-  .citation { color: var(--maroon); }
-  .theme-indigo .citation { color: var(--terracotta); }
-  .theme-accent .citation { color: var(--royal-blue); }
-  .citation-en { color: #4a4034; }
-  .verse-block .verse { color: #262019; }
-  .verse-block .translation { color: #4a4034; }
-  .btn-outline { border-color: rgba(243,234,210,0.35); color: var(--ink); }
-  .source-toggle { background: rgba(255,255,255,0.08); }
-  .toggle-btn { color: var(--ink-soft); }
-  .faq-page details { border-bottom-color: rgba(243, 234, 210, 0.18); }
-  .faq-body code { background: rgba(243, 234, 210, 0.12); }
 }
